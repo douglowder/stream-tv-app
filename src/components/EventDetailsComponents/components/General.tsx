@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { View, StyleSheet, Dimensions } from 'react-native';
+import React, { useState, useEffect, useRef, RefObject } from 'react';
+import { View, StyleSheet, Dimensions, TouchableHighlight } from 'react-native';
 import { scaleSize } from '@utils/scaleSize';
 import RohText from '@components/RohText';
 import FastImage from 'react-native-fast-image';
@@ -19,15 +19,21 @@ import {
   removeIdFromMyList,
   addToMyList,
 } from '@services/myList';
-import { useDispatch, useSelector } from 'react-redux';
+import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import { getPerformanceVideoURL } from '@services/store/videos/Slices';
-import { videoListSelector, videoListItemSelector } from '@services/store/videos/Selectors';
+import {
+  videoListSelector,
+  videoListItemSelector,
+} from '@services/store/videos/Selectors';
+import { toggleSubscriptionMode } from '@services/store/auth/Slices';
+import { subscribedModeSelector } from '@services/store/auth/Selectors';
+import { globalModalManager } from '@components/GlobalModal';
+import { NonSubscribedModeAlert } from '@components/GlobalModal/variants';
 
 let defaultPerfVidUrl = 'https://video-ingestor-output-bucket.s3.eu-west-1.amazonaws.com/6565/manifest.m3u8';
 
 type Props = {
   event: TEventContainer;
-  scrollToMe: () => void;
   nextScreenText: string;
   isBMPlayerShowing: boolean;
   showPlayer: (...args: any[]) => void;
@@ -35,7 +41,6 @@ type Props = {
 
 const General: React.FC<Props> = ({
   event,
-  scrollToMe = () => {},
   showPlayer,
   nextScreenText = 'Some Screen',
 }) => {
@@ -46,6 +51,10 @@ const General: React.FC<Props> = ({
   let selectedVideoId = useRef('');
   const videoListItem: TEventVideo = useSelector(videoListItemSelector(selectedVideoId.current));
   const videoList: Array<TEventVideo> = useSelector(videoListSelector);
+  const subscribedMode: string = useSelector(
+    subscribedModeSelector,
+    shallowEqual,
+  );
 
   const title: string =
     get(event.data, ['vs_event_details', 'title'], '').replace(
@@ -111,15 +120,29 @@ const General: React.FC<Props> = ({
           key: 'WatchNow',
           text: 'Watch now',
           hasTVPreferredFocus: true,
-          onPress: () =>
-          {
-            showPlayer({
-              videoId: event.id,
-              url: perfVidURL,
-              title,
-              poster:
-                'https://actualites.music-opera.com/wp-content/uploads/2019/09/14OPENING-superJumbo.jpg',
-              subtitle: title,
+          onPress: (ref?: RefObject<TouchableHighlight>) => {
+            if (subscribedMode) {
+              showPlayer({
+                videoId: event.id,
+                url: perfVidURL,
+                title,
+                poster:
+                  'https://actualites.music-opera.com/wp-content/uploads/2019/09/14OPENING-superJumbo.jpg',
+                subtitle: title,
+              });
+              return;
+            }
+            globalModalManager.openModal({
+              contentComponent: NonSubscribedModeAlert,
+              contentProps: {
+                confirmActionHandler: () => {
+                  globalModalManager.closeModal(() => {
+                    if (typeof ref?.current?.setNativeProps === 'function') {
+                      ref.current.setNativeProps({ hasTVPreferredFocus: true });
+                    }
+                  });
+                },
+              },
             });
           },
           onFocus: () => console.log('Watch now focus'),
@@ -145,6 +168,14 @@ const General: React.FC<Props> = ({
           onPress: () => console.log('Audio & Subtitles press'),
           onFocus: () => console.log('Audio & Subtitles focus'),
           Icon: Subtitles,
+        },
+        {
+          key: 'SubscribedMode',
+          text: `Switch to ${
+            subscribedMode ? 'non-subscribed' : 'subscribed'
+          } mode(only for testing)`,
+          onPress: () => dispatch(toggleSubscriptionMode()),
+          onFocus: () => console.log('Audio & Subtitles focus'),
         },
       ],
     };
@@ -181,7 +212,7 @@ const General: React.FC<Props> = ({
           </View>
         </View>
         <View style={styles.downContainer}>
-          <GoDown text={nextScreenText} scrollToMe={scrollToMe} />
+          <GoDown text={nextScreenText} />
         </View>
       </View>
       <View style={styles.snapshotContainer}>
@@ -220,6 +251,7 @@ const styles = StyleSheet.create({
   snapshotContainer: {
     width: scaleSize(975),
     height: Dimensions.get('window').height,
+    zIndex: 0,
   },
   pageTitle: {
     color: 'white',

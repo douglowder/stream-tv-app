@@ -1,5 +1,5 @@
 export const Colors = Object.freeze({
-  backgroundColor: '#0E1B31',
+  backgroundColor: '#050F20',
   backgroundColorTransparent: '#0E1B31CC',
   defaultBlue: '#6990CE',
   navIconDefault: '#F1F1F1',
@@ -7,8 +7,11 @@ export const Colors = Object.freeze({
   defaultTextColor: '#F1F1F1',
   searchDisplayBackgroundColor: '#4B5B7A',
   midGrey: '#7E91B4',
+  tVMidGrey: '#6887B6',
   title: '#FFFFFF',
   subtitlesActiveBackground: '#1866DC',
+  streamPrimary: '#1866DC',
+  tvDarkTint: '#050F20',
 });
 
 export const Images = Object.freeze({

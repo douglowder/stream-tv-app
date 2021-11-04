@@ -11,6 +11,7 @@ import { Colors, Images } from '@themes/Styleguide';
 import { scaleSize } from '@utils/scaleSize';
 import RohText from '@components/RohText';
 import { startLoginLoop } from '@services/store/auth/Slices';
+import TouchableHighlightWrapper from '@components/TouchableHighlightWrapper';
 
 type TIntroScreenProps = {};
 
@@ -34,12 +35,13 @@ const IntroScreen: React.FC<TIntroScreenProps> = () => {
             library of opera and ballet
           </RohText>
         </View>
-        <TouchableHighlight
+        <TouchableHighlightWrapper
           onPress={getStarted}
           style={styles.button}
+          canCollapseNavMenu={false}
           hasTVPreferredFocus>
           <RohText style={styles.buttonText}>Get started</RohText>
-        </TouchableHighlight>
+        </TouchableHighlightWrapper>
       </View>
     </ImageBackground>
   );

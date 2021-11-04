@@ -7,6 +7,7 @@ interface AuthState {
   customerId: null | number;
   showIntroScreen: boolean;
   errorString: string;
+  fullSubscription: boolean;
 }
 
 const initialState: AuthState = {
@@ -16,6 +17,7 @@ const initialState: AuthState = {
   customerId: null,
   showIntroScreen: true,
   errorString: '',
+  fullSubscription: false,
 };
 
 const appSlice = createSlice({
@@ -49,6 +51,10 @@ const appSlice = createSlice({
       }
       state.isLoading = false;
     },
+    clearAuthState: () => ({ ...initialState }),
+    toggleSubscriptionMode: state => {
+      state.fullSubscription = !state.fullSubscription;
+    },
   },
 });
 
@@ -60,6 +66,8 @@ export const {
   switchOffIntroScreen,
   startLoginLoop,
   endLoginLoop,
+  clearAuthState,
+  toggleSubscriptionMode,
 } = appSlice.actions;
 
 export const { reducer, name } = appSlice;
