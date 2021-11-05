@@ -6,7 +6,6 @@ import {
   Dimensions,
   VirtualizedList,
   ViewToken,
-  Platform,
 } from 'react-native';
 import { TEventContainer } from '@services/types/models';
 import collectionOfEventDetailsSections, {
@@ -133,10 +132,7 @@ const EventDetailsScreen: React.FC<TEventDetalsScreenProps> = ({ route }) => {
   }
   return (
     <View style={styles.rootContainer}>
-      {Platform.isTV &&
-        Platform.OS === 'ios' ?
-        shouldShowBack && <GoBack /> :
-        <GoBack/>}
+      {shouldShowBack ? <GoBack /> : null}
       <VirtualizedList
         ref={VirtualizedListRef}
         style={styles.scrollView}
