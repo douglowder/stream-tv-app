@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { View, StyleSheet, Dimensions } from 'react-native';
+import { View, StyleSheet, Dimensions, TVFocusGuideView } from 'react-native';
 import { useSelector } from 'react-redux';
 import { digitalEventsForHomePageSelector } from '@services/store/events/Selectors';
 import {
@@ -15,19 +15,24 @@ import {
   marginLeftStop,
 } from '@configs/navMenuConfig';
 import { useMyList } from '@hooks/useMyList';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+import { TRailSectionsProps } from '@components/EventListComponents/components/RailSections';
 
 type THomePageScreenProps = {};
 const HomePageScreen: React.FC<THomePageScreenProps> = () => {
   const myList = useMyList();
   const data = useSelector(digitalEventsForHomePageSelector(myList));
   const previewRef = useRef(null);
+  const viewRef = useRef<View>(null);
   if (!data.length) {
     return null;
   }
+
+  console.log('homepage', viewRef.current);
   return (
-    <View style={styles.root}>
+    <TVFocusGuideView style={styles.root} destinations={[viewRef.current]}>
       <Preview ref={previewRef} />
-      <View>
+      <View ref={viewRef}>
         <RailSections
           containerStyle={styles.railContainerStyle}
           headerContainerStyle={styles.railHeaderContainerStyle}
@@ -51,7 +56,7 @@ const HomePageScreen: React.FC<THomePageScreenProps> = () => {
           )}
         />
       </View>
-    </View>
+    </TVFocusGuideView>
   );
 };
 
