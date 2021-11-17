@@ -42,6 +42,7 @@ const MyListScreen: React.FC<TMyListScreenProps> = () => {
                   (index + 1) % countOfItemsPeerRail !== 0 &&
                   index !== data.length - 1
                 }
+                hasTVPreferredFocus={index === 0}
               />
             </View>
           )}
